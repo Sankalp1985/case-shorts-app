@@ -42,13 +42,16 @@ async function loadFeed() {
         const res = await fetch(SCRIPT_URL);
         const json = await res.json();
 
-        if (!json.success) throw new Error();
+        console.log("API response:", json);
 
-        renderStories(json.data);
+        const data = json.data || json; // supports both formats
+
+        renderStories(data);
         observeCards();
 
     } catch (e) {
-        document.getElementById("feed").innerHTML = "Failed to load.";
+        console.error("Load error:", e);
+        document.getElementById("feed").innerHTML = "Error: " + e.message;
     }
 }
 
@@ -98,7 +101,9 @@ function observeCards() {
 // LIKE
 function like(id) {
     const el = document.getElementById("like-" + id);
-    el.innerText = parseInt(el.innerText) + 1;
+    let current = parseInt(el.innerText) || 0;
+    el.innerText = current + 1;
+
     sendAnalytics(id, "like");
 }
 
@@ -112,7 +117,7 @@ function sendAnalytics(id, type) {
             type: type,
             apiKey: API_KEY
         })
-    });
+    }).catch(err => console.error("POST failed:", err));
 }
 
 // ANALYTICS PANEL
@@ -131,15 +136,18 @@ async function loadStats() {
         const res = await fetch(SCRIPT_URL + "?action=getStats");
         const json = await res.json();
 
-        if (!json.success) throw new Error();
+        console.log("Stats response:", json);
 
-        box.innerHTML = json.data.map((s,i)=>`
+        const data = json.data || json;
+
+        box.innerHTML = data.map((s,i)=>`
             <div>
                 ${i+1}. ${s.title} (${s.opens})
             </div>
         `).join("");
 
-    } catch {
+    } catch (e) {
+        console.error("Stats error:", e);
         box.innerHTML = "Failed to load stats";
     }
 }
