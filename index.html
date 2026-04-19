@@ -1,39 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShortsFeed | Insights in Seconds</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShortsFeed | Insights in Seconds</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
-<style>
-body { background:#050505;color:#fff;margin:0;overflow:hidden;font-family:Inter,sans-serif;}
-.feed-container {height:100vh;scroll-snap-type:y mandatory;overflow-y:scroll;}
-.feed-container::-webkit-scrollbar{display:none;}
-.card{height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;}
-.image-container{height:55%;overflow:hidden;}
-.content-container{height:45%;background:#fff;color:#111;padding:2rem;border-radius:30px;margin-top:-40px;}
-.action-bar{position:absolute;bottom:0;left:0;right:0;padding:1rem;background:#fff;display:flex;justify-content:space-between;}
-#analytics-panel{position:fixed;inset:0;background:#000;transform:translateY(100%);transition:0.4s;}
-#analytics-panel.open{transform:translateY(0);}
-</style>
+    <style>
+        :root { --accent: #ff0000; }
+        body { 
+            background: #000; 
+            color: #fff; 
+            margin: 0; 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Snap Container */
+        .feed-container {
+            height: 100vh;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            scrollbar-width: none;
+        }
+        .feed-container::-webkit-scrollbar { display: none; }
+
+        /* Card Layout */
+        .card {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .image-container {
+            height: 55%;
+            width: 100%;
+            position: relative;
+            background: #111;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        /* Content Area */
+        .content-container {
+            height: 45%;
+            background: #ffffff;
+            color: #000;
+            padding: 2.5rem 1.5rem;
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            margin-top: -35px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .action-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.25rem 1.5rem;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #eee;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        /* Analytics Slide-up */
+        #analytics-panel {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(15px);
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            padding: 2rem 1.5rem;
+        }
+        #analytics-panel.open { transform: translateY(0); }
+
+        .trending-row {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0.75rem;
+            padding: 1rem;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </head>
 
 <body>
 
+<div class="fixed top-0 w-full z-50 p-4 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
+    <div class="text-xl font-extrabold tracking-tighter text-white">SHORTS<span class="text-red-600">FEED</span></div>
+    <button onclick="toggleAnalytics()" class="bg-white/10 hover:bg-white/20 backdrop-blur-md p-2 px-4 rounded-full text-[10px] font-black border border-white/20 transition-all flex items-center space-x-2">
+        <span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"></span>
+        <span>TRENDING</span>
+    </button>
+</div>
+
 <div class="feed-container" id="feed">
-    <div class="h-full flex items-center justify-center text-gray-500">Loading...</div>
+    <div class="h-full flex flex-col items-center justify-center text-gray-500 space-y-4">
+        <div class="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-[10px] font-bold tracking-widest uppercase">Fetching Intelligence</p>
+    </div>
 </div>
 
 <div id="analytics-panel">
-    <button onclick="toggleAnalytics()">Close</button>
-    <div id="stats-list"></div>
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-black italic uppercase tracking-tighter">Top <span class="text-red-600">Stories</span></h2>
+        <button onclick="toggleAnalytics()" class="h-10 w-10 flex items-center justify-center rounded-full bg-white/10 text-white">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    <div id="stats-list" class="overflow-y-auto max-h-[80vh]">
+        <p class="text-gray-500 text-sm italic">Syncing metrics...</p>
+    </div>
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMenWKEzLlrJ5T-pjs8H8SKdMaQY9D98vFZQMAQSOkV7flfHi9lCIbbmt9spAHoDpYQQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbMenWKEzLlrJ5T-pjs8H8SKdMaQY9D98vFZQMAQSOkV7flfHi9lCIbbmt9spAHoDpYQQ/exec";
 const API_KEY = "abc1991securekey";
 
 // LOAD FEED
@@ -41,14 +148,16 @@ async function loadFeed() {
     try {
         const res = await fetch(SCRIPT_URL);
         const json = await res.json();
-
         if (!json.success) throw new Error();
-
         renderStories(json.data);
         observeCards();
-
     } catch (e) {
-        document.getElementById("feed").innerHTML = "Failed to load.";
+        document.getElementById("feed").innerHTML = `
+            <div class="p-10 text-center space-y-4">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-3xl"></i>
+                <p class="text-sm font-bold uppercase tracking-widest">Network Error</p>
+                <button onclick="location.reload()" class="text-[10px] underline">RETRY</button>
+            </div>`;
     }
 }
 
@@ -64,17 +173,34 @@ function renderStories(stories) {
 
         card.innerHTML = `
             <div class="image-container">
-                <img src="${story.image_url}" style="width:100%;height:100%;object-fit:cover;">
+                <img src="${story.image_url}" onerror="this.src='https://via.placeholder.com/600x800?text=No+Image'">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             </div>
             <div class="content-container">
-                <h2>${story.title}</h2>
-                <p>${story.content}</p>
+                <div class="mb-2">
+                    <span class="bg-red-600 text-white text-[9px] font-black px-2 py-1 rounded tracking-widest uppercase">
+                        ${story.category || 'Insights'}
+                    </span>
+                </div>
+                <h2 class="text-2xl font-extrabold leading-tight tracking-tight mb-4 text-gray-900 line-clamp-2">
+                    ${story.title}
+                </h2>
+                <div class="text-gray-600 text-sm leading-relaxed overflow-y-auto pr-2 mb-10 h-32 scroll-thin">
+                    ${story.content}
+                </div>
 
                 <div class="action-bar">
-                    <button onclick="like('${story.id}')">
-                        ❤️ <span id="like-${story.id}">${story.likes || 0}</span>
-                    </button>
-                    <button onclick="share('${story.title}')">Share</button>
+                    <div class="flex space-x-10">
+                        <button onclick="like('${story.id}')" class="flex flex-col items-center group">
+                            <i id="heart-icon-${story.id}" class="fa-regular fa-heart text-xl group-active:scale-125 transition-transform"></i>
+                            <span class="text-[10px] font-bold mt-1 text-gray-400" id="like-${story.id}">${story.likes || 0}</span>
+                        </button>
+                        <button onclick="share('${story.title}')" class="flex flex-col items-center group">
+                            <i class="fa-brands fa-whatsapp text-2xl text-green-600 group-active:scale-110 transition-transform"></i>
+                            <span class="text-[10px] font-bold mt-1 text-gray-400 uppercase tracking-tighter">Share</span>
+                        </button>
+                    </div>
+                    <div class="text-[9px] font-black text-gray-300 uppercase tracking-[0.2em]">ID: ${story.id}</div>
                 </div>
             </div>
         `;
@@ -82,7 +208,7 @@ function renderStories(stories) {
     });
 }
 
-// OBSERVER (track opens)
+// OBSERVER
 function observeCards() {
     const observer = new IntersectionObserver(entries => {
         entries.forEach(e => {
@@ -91,27 +217,29 @@ function observeCards() {
             }
         });
     }, { threshold: 0.7 });
-
     document.querySelectorAll(".card").forEach(c => observer.observe(c));
 }
 
 // LIKE
 function like(id) {
     const el = document.getElementById("like-" + id);
-    el.innerText = parseInt(el.innerText) + 1;
-    sendAnalytics(id, "like");
+    const icon = document.getElementById("heart-icon-" + id);
+    
+    if(!icon.classList.contains('fa-solid')) {
+        icon.classList.remove('fa-regular');
+        icon.classList.add('fa-solid', 'text-red-600');
+        el.innerText = parseInt(el.innerText) + 1;
+        sendAnalytics(id, "like");
+    }
 }
 
 // SEND ANALYTICS
 function sendAnalytics(id, type) {
     fetch(SCRIPT_URL, {
         method: "POST",
+        mode: "no-cors", // Necessary for Google Script POST
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            id: id,
-            type: type,
-            apiKey: API_KEY
-        })
+        body: JSON.stringify({ id: id, type: type, apiKey: API_KEY })
     });
 }
 
@@ -125,28 +253,36 @@ function toggleAnalytics() {
 // FETCH STATS
 async function loadStats() {
     const box = document.getElementById("stats-list");
-    box.innerHTML = "Loading...";
+    box.innerHTML = `<div class="p-4 text-center animate-pulse text-gray-500 text-xs">CALCULATING REACH...</div>`;
 
     try {
         const res = await fetch(SCRIPT_URL + "?action=getStats");
         const json = await res.json();
-
         if (!json.success) throw new Error();
 
         box.innerHTML = json.data.map((s,i)=>`
-            <div>
-                ${i+1}. ${s.title} (${s.opens})
+            <div class="trending-row">
+                <div class="flex items-center space-x-4">
+                    <span class="text-xl font-black italic text-red-600 w-6">#${i+1}</span>
+                    <div>
+                        <div class="text-sm font-bold text-white line-clamp-1">${s.title}</div>
+                        <div class="text-[9px] text-gray-500 uppercase tracking-widest">${s.id}</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs font-black text-white">${s.opens}</div>
+                    <div class="text-[8px] text-gray-500 uppercase">Reads</div>
+                </div>
             </div>
         `).join("");
-
     } catch {
-        box.innerHTML = "Failed to load stats";
+        box.innerHTML = `<div class="p-10 text-center text-xs text-red-600">Failed to sync metrics.</div>`;
     }
 }
 
 // SHARE
 function share(title) {
-    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(title));
+    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent("Check this out: " + title + " " + window.location.href));
 }
 
 window.onload = loadFeed;
